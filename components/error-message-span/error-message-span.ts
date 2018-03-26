@@ -8,5 +8,9 @@ import { Component, Input } from '@angular/core'
 export class ErrorMessageSpan {
     @Input() errorText: string; //TODO maybe allow something more complex than text
     @Input() iconType: string = "alert";
-	constructor() { }
+    constructor() { }
+    
+    public testEvent() {
+        console.log("Yes Please!");
+    }
 }

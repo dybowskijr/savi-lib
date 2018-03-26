@@ -1,5 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {ValidationErrors} from '@angular/forms';
+import { CONSTRAINTS } from '../provider/config';
 /**
  *  this pipe will receive a JSON ValidationError (or null) and transform it to 
  *    a proper user error message.
@@ -11,6 +12,13 @@ import {ValidationErrors} from '@angular/forms';
 export class ValidationErrorPipe {
     
 validationMessages = {
+        password: {
+            required: 'Required',
+            pattern: 'Invalid - Please click ! icon for format',
+            matchedpair: 'TODO: Matched Pair',
+            minlength: 'Must be ' + CONSTRAINTS.PASSWORD_MIN + '+ characters',
+            maxlength: 'Must be ' + CONSTRAINTS.PASSWORD_MAX + '+ characters',
+        },
         first_name: {
             required: 'Required',
             minlength: 'Must be at least 1 character',
@@ -38,6 +46,13 @@ validationMessages = {
             pattern: 'Last Name must contain only letters'
         },
         email: {default: 'Invalid Email Address'},
+        username: {
+            default: 'Invalid Username',
+            required: 'Required',
+            pattern: 'Invalid - Please click ! icon for format',
+            minlength: "Must be 8+ characters",
+            maxlength: "Must be less then 30 characters"
+        },
         unknown: {default: 'Unsupported Form Error'}
     };    
     
@@ -79,7 +94,6 @@ validationMessages = {
         }
         console.log("final retVal: \n" + retVal);
         return retVal;
-    }
-    
+    }    
 }
 

@@ -1,0 +1,19 @@
+<ion-list radio-group [(ngModel)]="pcmethod" (ngModelChange)="pcMethodChange($event)">
+    <ion-list-header><span class="required-field">*</span>Preferred Contact Method</ion-list-header>
+
+    <ion-item no-lines>
+        <ion-label>Email</ion-label>
+        <ion-radio value="email"></ion-radio>
+    </ion-item>
+
+    <ion-item no-lines *ngIf="pcmethod == 'email'">
+        <ion-input autocapitalize="off" placeholder="Email@mail.com" (ionBlur)="blur($event)" [(ngModel)]="pcvalue" (ngModelChange)="emailChanged($event)"></ion-input>
+    </ion-item>
+
+    <ion-item no-lines>
+        <ion-label>Mobile Phone</ion-label>
+        <ion-radio value="sms"></ion-radio>
+    </ion-item>
+
+    <phone-input idsuffix="reg" [pn]="mobile" (mobileValueBlur)="blur()" #phoneinput *ngIf="pcmethod != 'email'" (mobileValueChanged)="mobileChanged($event)"></phone-input>
+</ion-list>

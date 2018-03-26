@@ -53,7 +53,11 @@ export const CONSTRAINTS = {
     FIRST_NAME_MIN: 2,
     LAST_NAME_MIN: 2,
     FIRST_NAME_PATTERN: "[a-z A-Z]*",
-    LAST_NAME_PATTERN: "[a-z A-Z]*"
+    LAST_NAME_PATTERN: "[a-z A-Z]*",
+    USER_NAME_MIN: 8,
+    USER_NAME_MAX: 30,
+    PASSWORD_MIN: 8,
+    PASSWORD_MAX: 32
 
 };
     

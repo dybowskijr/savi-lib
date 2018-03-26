@@ -1,4 +1,4 @@
-<span style="color: red">
+<span style="color: red" (click)="testEvent()" >
     (<ion-icon name="{{iconType}}" style="color: red; margin-bottom: 0px">
-    </ion-icon>{{errorText}})<br />
+    </ion-icon>{{errorText | json}})
 </span>
