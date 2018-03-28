@@ -6,7 +6,7 @@ import { PhoneInput } from '../phone-input.component';
     templateUrl: 'contact-method-reactive.html'
 })
 
-export class ContactMethod {
+export class ContactMethodReactive {
   @Input('email') pcmethod: string;
   @Input('emailValue') pcvalue: string;
   @Input('pn') mobile: string;

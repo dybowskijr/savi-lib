@@ -53,14 +53,13 @@ validationMessages = {
             minlength: "Must be 8+ characters",
             maxlength: "Must be less then 30 characters"
         },
-        unknown: {default: 'Unsupported Form Error'}
+        unknown: {default: 'Unsupported Input Error'}
     };    
     
     transform(valError: any, inputType: string): string {
         let retVal : string = null; // case 1) no error
         if(<ValidationErrors>valError){ 
             try {
-                console.log("ve: \n" + JSON.stringify(valError));
                 retVal = this.validationMessages['unknown']['default']; // case 2 - default error message (Ideally shouldn't happen)
                 // case 3 - fully customized error message
                 if ( valError.hasOwnProperty('inputType') && valError.hasOwnProperty('errorCode') ) {
