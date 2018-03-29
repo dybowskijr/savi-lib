@@ -1,5 +1,7 @@
-<ion-list radio-group [formGroup]="formGroup">
-    <ion-list-header><span class="required-field">*</span>Preferred Contact Method
+<ion-list [formGroup]="formGroup">
+    <div radio-group formControlName="pcmethod" >
+    <ion-list-header><span class="required-field">*</span>
+         Preferred Contact Method
         <error-message-span *ngIf="true"
             [errorText]="'Temp Error Message'" [iconType]="'none'">
         </error-message-span>
@@ -7,18 +9,20 @@
 
     <ion-item no-lines>
         <ion-label>Email</ion-label>
-        <ion-radio value="email" formControlName="pcmethod"></ion-radio>
+        <ion-radio value="email"></ion-radio>
     </ion-item>
 
     <ion-item no-lines *ngIf="formGroup.controls.pcmethod.value === 'email'">
-        <ion-input autocapitalize="off" placeholder="email@mail.com" formControlName="email"></ion-input>
+        <ion-input autocapitalize="off" placeholder="email@mail.com"
+           formControlName="email"></ion-input>
     </ion-item>
 
     <ion-item no-lines>
         <ion-label>Mobile Phone</ion-label>
-        <ion-radio value="sms" formControlName="pcmethod"></ion-radio>
+        <ion-radio value="sms"></ion-radio>
     </ion-item>
 
-    <phone-input idsuffix="reg" [pn]="mobile" (mobileValueBlur)="blur()" #phoneinput 
-        *ngIf="formGroup.controls.pcmethod.value === 'email'" (mobileValueChanged)="mobileChanged($event)"></phone-input>
+    <phone-input idsuffix="reg" [pn]="mobile" 
+        *ngIf="formGroup.controls.pcmethod.value === 'sms'"></phone-input>
+</div>
 </ion-list>
