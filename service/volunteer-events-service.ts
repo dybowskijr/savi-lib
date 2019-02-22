@@ -27,7 +27,8 @@ export class VolunteerEventsService {
     myEvents: Array<MyEvent> = [];
     image: Array<EventImage>;
 
-    private _eventCategories: Observable<any> = null; // for myPreference caching
+    private _eventCategories: Observable<any> = null; // for caching
+    private _eventEventCache: Observable<any> = null; // for caching
 
 
     private event: any = {
@@ -67,9 +68,13 @@ export class VolunteerEventsService {
     }
 
     getVolunteerEvents(): Observable<any[]> {
-        return this.http.get(SERVER + GET_EVENTS_URI)
+        let volEventServicesThis = this;
+        if(!volEventServicesThis._eventEventCache) {
+            volEventServicesThis._eventEventCache = this.http.get(SERVER + GET_EVENTS_URI, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+        }
+        return volEventServicesThis._eventEventCache;
     }
     getVolunteerEventDetails(eventId: string): Observable<EventDetail> {
         return this.http.get(SERVER + GET_EVENT_DETAILS_URI + eventId + "/", this.getOptions())
