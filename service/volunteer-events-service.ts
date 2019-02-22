@@ -27,7 +27,9 @@ export class VolunteerEventsService {
     myEvents: Array<MyEvent> = [];
     image: Array<EventImage>;
 
-    private _eventCategories: Observable<any> = null; // for myPreference caching
+    private _eventCategories: Observable<any> = null; // for caching
+    private _eventEventCache: Observable<any> = null; // for caching
+    private _eventMyEventsCache: Observable<MyEvent[]> = null; // yes, for caching
 
 
     private event: any = {
@@ -45,8 +47,9 @@ export class VolunteerEventsService {
     }
     getEventCategories(): Observable<any> {
         let volEventServicesThis = this;
-        if(!volEventServicesThis._eventCategories) {
-            volEventServicesThis._eventCategories = volEventServicesThis.http.get(SERVER + EVENT_CATEGORIES_URI, this.getOptions())
+        if (!volEventServicesThis._eventCategories) {
+            volEventServicesThis._eventCategories = 
+                volEventServicesThis.http.get(SERVER + EVENT_CATEGORIES_URI, volEventServicesThis.getOptions())
                 .map(res => res.json())
                 .publishReplay(1)
                 .refCount()
@@ -57,19 +60,25 @@ export class VolunteerEventsService {
     
     getEventsReport(body) {
         // TODO: fix this GET_EVENTS_REPORT_URI to use local timezone offset
-        return this.http.get(SERVER + GET_EVENTS_REPORT_URI + '?timeMin=' + body.start + 'T06:00:00.000Z&timeMax=' + body.end + 'T06:00:00.000Z', this.getOptionsForReport())
+        return this.http.get(SERVER + GET_EVENTS_REPORT_URI + '?timeMin=' + body.start + 
+                             'T06:00:00.000Z&timeMax=' + body.end + 'T06:00:00.000Z', this.getOptionsForReport())
             .map(res => res.text())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
 
     clearEvents() {
         this.myEvents.length = 0;
+        this._eventEventCache = null;
     }
 
     getVolunteerEvents(): Observable<any[]> {
-        return this.http.get(SERVER + GET_EVENTS_URI)
+        let volEventServicesThis = this;
+        if(!volEventServicesThis._eventEventCache) {
+            volEventServicesThis._eventEventCache = this.http.get(SERVER + GET_EVENTS_URI, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+        }
+        return volEventServicesThis._eventEventCache;
     }
     getVolunteerEventDetails(eventId: string): Observable<EventDetail> {
         return this.http.get(SERVER + GET_EVENT_DETAILS_URI + eventId + "/", this.getOptions())
@@ -88,17 +97,17 @@ export class VolunteerEventsService {
     }
 
     getVolunteerEventsMaxTime(maxTime: string): Observable<VolunteerEvent[]> {
-        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMax=" + maxTime)
+        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMax=" + maxTime, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
     getVolunteerEventsMinTime(minTime: string): Observable<VolunteerEvent[]> {
-        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMin=" + minTime)
+        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMin=" + minTime, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
     getVolunteerEventsTimeRange(minTime: string, maxTime: string): Observable<VolunteerEvent[]> {
-        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMin=" + minTime + "&timeMax=" + maxTime)
+        return this.http.get(SERVER + GET_EVENTS_URI + "?timeMin=" + minTime + "&timeMax=" + maxTime, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
@@ -138,10 +147,13 @@ export class VolunteerEventsService {
     }
     
     getMyEvents(): Observable<MyEvent[]> {
-
-        return this.http.get(SERVER + GET_MYEVENTS_URI, this.getOptions())
+        let volEventServicesThis = this;
+        if(!volEventServicesThis._eventMyEventsCache) {
+            volEventServicesThis._eventMyEventsCache = this.http.get(SERVER + GET_MYEVENTS_URI, volEventServicesThis.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+        }
+        return volEventServicesThis._eventMyEventsCache;
     }
     
     getMyEvent(eventId: string): Observable<MyEvent[]> {
@@ -156,6 +168,7 @@ export class VolunteerEventsService {
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
+    
     loadMyEvents() {
         if (this.userServices.user.id) {
             this.getMyEvents().subscribe(
@@ -166,16 +179,12 @@ export class VolunteerEventsService {
         };
     }
 
-
-    //Update EventDetails --
     updateEventDetails(eventDetail: EventDetail): Observable<any> {
         return this.http.put(SERVER + GET_ADMIN_EVENT_DETAILS_URI + eventDetail.id + "/", eventDetail, this.getOptions())
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error || 'Server error'));
     }
 
-
-    //Cancel Event --
     cancelEvent(eventId: string): Observable<any> {
         return this.http.delete(SERVER + EVENT_CANCEL_URI + eventId + "/", this.getOptions())
             .map(res => res.json())
@@ -183,14 +192,15 @@ export class VolunteerEventsService {
     }
 
     getOptions() {
-        let headers = new Headers();
+        const headers = new Headers();
         if (this.userServices) if (this.userServices.user.id) headers.append('Authorization', 'Token ' + this.userServices.user.id);
         headers.append('Content-Type', 'application/json;q=0.9');
         headers.append('Accept', 'application/json;q=0.9');
         return new RequestOptions({ headers: headers });
     }
+
     getOptionsForReport() {
-        let headers = new Headers();
+        const headers = new Headers();
         if (this.userServices) if (this.userServices.user.id) headers.append('Authorization', 'Token ' + this.userServices.user.id);
         headers.append('Content-Type', 'application/json;q=0.9');
         headers.append('Accept', 'application/json, text/csv;q=0.9');
@@ -217,14 +227,14 @@ export class VolunteerEventsService {
             .map(res => res.json())
             .catch((error: any) => Observable.throw(error || 'Server error'));
     }
-        checkMyEvents(eventId: string): Observable<any>{
-            this.event.event_id = eventId; 
-            this.event.notification_schedule = 0;
-            this.event.overlap_override = true;
-            this.event.notification_option = 0;
-            return this.http.post(SERVER + CHECK_MY_EVENTS_URI,this.event, this.getOptions())
-                .map(res => res.json())
-                .catch((error: any) => Observable.throw(error || 'Server error'));
-        }
 
+    checkMyEvents(eventId: string): Observable<any>{
+        this.event.event_id = eventId; 
+        this.event.notification_schedule = 0;
+        this.event.overlap_override = true;
+        this.event.notification_option = 0;
+        return this.http.post(SERVER + CHECK_MY_EVENTS_URI,this.event, this.getOptions())
+            .map(res => res.json())
+            .catch((error: any) => Observable.throw(error || 'Server error'));
+    }
 }
